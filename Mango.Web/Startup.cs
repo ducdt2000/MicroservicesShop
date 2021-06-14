@@ -30,8 +30,29 @@ namespace Mango.Web
             SD.ProductAPIBase = Configuration["ServiceUrls:ProductService"];
 
             services.AddScoped<IProductService, ProductService>();
-
             services.AddControllersWithViews();
+
+            services.AddAuthentication(o =>
+            {
+                o.DefaultScheme = "Cookies";
+                o.DefaultChallengeScheme = "oidc";
+            })
+                .AddCookie("Cookies", c => c.ExpireTimeSpan = TimeSpan.FromMinutes(10))
+                .AddOpenIdConnect("oidc", o =>
+                {
+                    o.Authority = Configuration["ServiceUrls:IdentityService"];
+                    o.GetClaimsFromUserInfoEndpoint = true;
+                    o.ClientId = "mango";
+                    o.ClientSecret = "secret";
+                    //here
+                    o.ResponseType = "code";
+                    //
+                    o.TokenValidationParameters.NameClaimType = "name";
+                    o.TokenValidationParameters.RoleClaimType = "role";
+                    o.Scope.Add("mango");
+                    o.SaveTokens = true;
+                });
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -51,7 +72,7 @@ namespace Mango.Web
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
