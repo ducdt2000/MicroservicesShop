@@ -18,11 +18,13 @@ namespace Mango.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IProductService _productService;
+        private readonly IShoppingCartService _cartService;
 
-        public HomeController(ILogger<HomeController> logger, IProductService productService)
+        public HomeController(ILogger<HomeController> logger, IProductService productService, IShoppingCartService cartService)
         {
             _logger = logger;
             _productService = productService;
+            _cartService = cartService;
         }
 
         [Authorize]
@@ -37,8 +39,50 @@ namespace Mango.Web.Controllers
             return View(model);
         }
 
+        [HttpPost]
+        [ActionName("Details")]
+        [Authorize]
+        public async Task<IActionResult> DetailsPost(ProductDTO productDTO)
+        {
+            CartDTO cartDTO = new()
+            {
+                CartHeader = new CartHeaderDTO
+                {
+                    UserId = User.Claims.Where(u => u.Type == "sub")?.FirstOrDefault()?.Value
+                }
+            };
+
+            CartDetailsDTO cartDetailsDTO = new CartDetailsDTO()
+            {
+                Count = productDTO.Count,
+                ProductId = productDTO.Id
+            };
+
+            var response = await _productService.GetProductByIdAsync<ResponseDTO>(productDTO.Id, "");
+            if(response!=null && response.IsSuccess)
+            {
+                cartDetailsDTO.Product = JsonConvert.DeserializeObject<ProductDTO>(Convert.ToString(response.Result));
+            }
+
+            List<CartDetailsDTO> cartDetailsDTOs = new();
+            cartDetailsDTOs.Add(cartDetailsDTO);
+            cartDTO.CartDetails = cartDetailsDTOs;
+
+            var token = await HttpContext.GetTokenAsync("access_token");
+            var addToCartResponse = await _cartService.AddToCartAsync<ResponseDTO>(cartDTO, token);
+            
+            if (response != null && response.IsSuccess)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+
+            return View(productDTO);
+        }
+
         public async Task<IActionResult> Index()
         {
+            var userId = User.Claims.Where(u => u.Type == "sub")?.FirstOrDefault()?.Value;
             List<ProductDTO> list = new();
             var response = await _productService.GetAllProductAsync<ResponseDTO>("");
             if (response != null && response.IsSuccess)
