@@ -1,4 +1,5 @@
 ﻿using Mango.Services.ShoppingCartAPI.Models.DTOs;
+using Mango.Services.ShoppingCartAPI.Models.Messages;
 using Mango.Services.ShoppingCartAPI.Repository.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -10,12 +11,12 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
 {
     [ApiController]
     [Route("api/cart")]
-    public class CartController : Controller
+    public class CartAPIController : Controller
     {
         private readonly ICartRepository _cartRepository;
         protected ResponseDTO _response;
 
-        public CartController(ICartRepository cartRepository)
+        public CartAPIController(ICartRepository cartRepository)
         {
             _cartRepository = cartRepository;
             this._response = new ResponseDTO();
@@ -108,6 +109,27 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
             {
                 bool isSuccess = await _cartRepository.RemoveCoupon(userId);
                 _response.Result = isSuccess;
+            }
+            catch (Exception e)
+            {
+                _response.IsSuccess = false;
+                _response.ErrorMessge = new List<string>() { e.ToString() };
+            }
+            return _response;
+        }
+
+        [HttpPost("Checkout")]
+        public async Task<object> Checkout(CheckoutHeaderDTO checkoutHeaderDTO)
+        {
+            try
+            {
+                CartDTO cartDTO = await _cartRepository.GetCartByUserId(checkoutHeaderDTO.UserId);
+                if(cartDTO == null)
+                {
+                    return BadRequest();
+                }
+                checkoutHeaderDTO.CartDetails = cartDTO.CartDetails;
+
             }
             catch (Exception e)
             {

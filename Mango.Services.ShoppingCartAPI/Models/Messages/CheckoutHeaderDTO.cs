@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Mango.Services.ShoppingCartAPI.Models.DTOs;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Mango.Web.Models
+namespace Mango.Services.ShoppingCartAPI.Models.Messages
 {
-    public class CartHeaderDTO
+    public class CheckoutHeaderDTO
     {
         public int Id { get; set; }
         public string UserId { get; set; }
@@ -14,11 +15,13 @@ namespace Mango.Web.Models
         public double DiscountTotal { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public DateTime PickupDateTime{ get; set; }
+        public DateTime PickupDateTime { get; set; }
         public string Phone { get; set; }
         public string Email { get; set; }
         public string CardNumber { get; set; }
         public string CVV { get; set; }
         public string ExpiryMonthYear { get; set; }
+        public int CartTotalItem { get; set; }
+        public IEnumerable<CartDetailsDTO> CartDetails { get; set; }
     }
 }

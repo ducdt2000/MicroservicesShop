@@ -30,9 +30,12 @@ namespace Mango.Web
             services.AddHttpClient<IProductService, ProductService>();
             SD.ProductAPIBase = Configuration["ServiceUrls:ProductService"];
             SD.ShoppingCartAPIBase = Configuration["ServiceUrls:ShoppingCartService"];
+            SD.CouponAPIBase = Configuration["ServiceUrls:CouponService"];
 
+            //DI
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IShoppingCartService, ShoppingCartService>();
+            services.AddScoped<ICouponService, CouponService>();
             services.AddControllersWithViews();
 
             services.AddAuthentication(o =>
