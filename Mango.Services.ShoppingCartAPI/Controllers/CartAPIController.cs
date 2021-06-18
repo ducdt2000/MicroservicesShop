@@ -15,14 +15,17 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
     public class CartAPIController : Controller
     {
         private readonly ICartRepository _cartRepository;
+        private readonly ICouponRepository _couponRepository;
         protected ResponseDTO _response;
         private readonly IMessageBus _messageBus;
+        
 
-        public CartAPIController(ICartRepository cartRepository, IMessageBus messageBus)
+        public CartAPIController(ICartRepository cartRepository, IMessageBus messageBus, ICouponRepository couponRepository)
         {
             _cartRepository = cartRepository;
             _response = new ResponseDTO();
             _messageBus = messageBus;
+            _couponRepository = couponRepository;
         }
 
         [HttpGet("GetCart/{userId}")]
@@ -131,6 +134,19 @@ namespace Mango.Services.ShoppingCartAPI.Controllers
                 {
                     return BadRequest();
                 }
+
+                if (!string.IsNullOrEmpty(checkoutHeaderDTO.CouponCode))
+                {
+                    CouponDTO coupon = await _couponRepository.GetCoupon(checkoutHeaderDTO.CouponCode);
+                    if(checkoutHeaderDTO.DiscountTotal!= coupon.DiscountAmount)
+                    {
+                        _response.IsSuccess = false;
+                        _response.ErrorMessge = new List<string>() { "Coupon Price không tồn tại hoặc lỗi" };
+                        _response.DisplayMessage = "Coupon price bị lỗi";
+                        return _response;
+                    }
+                }
+
                 checkoutHeaderDTO.CartDetails = cartDTO.CartDetails;
                 //
                 await _messageBus.PublicMessage(checkoutHeaderDTO, "checkout/messagetopic");

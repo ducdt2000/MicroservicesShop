@@ -28,9 +28,9 @@ namespace Mango.Services.OrderAPI.Messaging
             _orderRepository = orderRepository;
             _configuration = configuration;
 
-            serviceBusConnectionString = configuration.GetValue<string>("ServiceBusConnectionString");
-            subcriptionCheckOut = configuration.GetValue<string>("SubcriptionCheckOut");
-            checkoutMessageTopic = configuration.GetValue<string>("CheckoutMessageTopic");
+            serviceBusConnectionString = _configuration.GetValue<string>("ServiceBusConnectionString");
+            subcriptionCheckOut = _configuration.GetValue<string>("SubcriptionCheckOut");
+            checkoutMessageTopic = _configuration.GetValue<string>("CheckoutMessageTopic");
 
             var client = new ServiceBusClient(serviceBusConnectionString);
             checkOutProcessor = client.CreateProcessor(checkoutMessageTopic, subcriptionCheckOut);

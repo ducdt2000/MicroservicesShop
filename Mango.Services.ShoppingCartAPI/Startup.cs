@@ -49,6 +49,7 @@ namespace Mango.Services.ShoppingCartAPI
             services.AddScoped<ICartRepository, CartRepository>();
             services.AddSingleton<IMessageBus, AzureServiceBusMessageBus>();
 
+            services.AddHttpClient<ICouponRepository, CouponRepository>(u => u.BaseAddress = new Uri(Configuration["ServiceUrls:CouponService"]));
             //add swagger
             services.AddControllers();
 
