@@ -48,7 +48,7 @@ namespace Mango.Services.OrderAPI
 
             //DI
             services.AddScoped<IOrderRepository, OrderRepository>();
-            services.AddScoped<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
+            services.AddSingleton<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
 
             var optionBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionBuilder.UseSqlServer(Configuration.GetConnectionString("SqlServer"));
@@ -85,7 +85,7 @@ namespace Mango.Services.OrderAPI
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mango.Services.ShoppingCartAPI", Version = "v1" });
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Mango.Services.OrderAPI", Version = "v1" });
                 c.EnableAnnotations();
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {

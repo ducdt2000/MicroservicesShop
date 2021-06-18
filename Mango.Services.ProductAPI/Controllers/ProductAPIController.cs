@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Mango.Services.ProductAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/product")]
     [ApiController]
     public class ProductAPIController : ControllerBase
     {
