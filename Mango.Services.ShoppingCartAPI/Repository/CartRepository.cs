@@ -31,7 +31,7 @@ namespace Mango.Services.ShoppingCartAPI.Repository
             return true;
         }
 
-        public async Task<bool> ClearCar(string userId)
+        public async Task<bool> ClearCart(string userId)
         {
             var cartHeaderFromDb = await _context.CartHeaders.FirstOrDefaultAsync(u => u.UserId == userId);
             if (cartHeaderFromDb != null)

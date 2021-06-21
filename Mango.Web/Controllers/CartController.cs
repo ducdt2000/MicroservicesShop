@@ -42,6 +42,7 @@ namespace Mango.Web.Controllers
             }
             return View();
         }
+
         [HttpPost]
         [ActionName("RemoveCoupon")]
         public async Task<IActionResult> RemoveCoupon(CartDTO cartDTO)
@@ -99,6 +100,7 @@ namespace Mango.Web.Controllers
             {
                 return View(cartDTO);
             }
+
         }
 
         public async Task<IActionResult> Confirmation()

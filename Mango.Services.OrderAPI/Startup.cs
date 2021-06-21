@@ -1,4 +1,5 @@
 using AutoMapper;
+using Mango.MessageBus;
 using Mango.Services.OrderAPI.DbContexts;
 using Mango.Services.OrderAPI.Extensions;
 using Mango.Services.OrderAPI.Messaging;
@@ -48,7 +49,9 @@ namespace Mango.Services.OrderAPI
 
             //DI
             services.AddScoped<IOrderRepository, OrderRepository>();
+
             services.AddSingleton<IAzureServiceBusConsumer, AzureServiceBusConsumer>();
+            services.AddSingleton<IMessageBus, AzureServiceBusMessageBus>();
 
             var optionBuilder = new DbContextOptionsBuilder<AppDbContext>();
             optionBuilder.UseSqlServer(Configuration.GetConnectionString("SqlServer"));

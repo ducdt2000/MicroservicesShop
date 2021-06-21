@@ -1,4 +1,5 @@
 ﻿using Azure.Messaging.ServiceBus;
+using Mango.MessageBus;
 using Mango.Services.OrderAPI.Messages;
 using Mango.Services.OrderAPI.Models;
 using Mango.Services.OrderAPI.Repository;
@@ -18,22 +19,31 @@ namespace Mango.Services.OrderAPI.Messaging
         private readonly string serviceBusConnectionString;
         private readonly string subcriptionCheckOut;
         private readonly string checkoutMessageTopic;
+        private readonly string orderPaymentMessageTopic;
+        private readonly string orderUpdatePaymentResultTopic;
 
         private ServiceBusProcessor checkOutProcessor;
+        private ServiceBusProcessor orderUpdatePaymentStatusProcessor;
 
         private readonly IConfiguration _configuration;
+        private readonly IMessageBus _messageBus;
 
-        public AzureServiceBusConsumer(OrderRepository orderRepository, IConfiguration configuration)
+        public AzureServiceBusConsumer(OrderRepository orderRepository, IConfiguration configuration, IMessageBus messageBus)
         {
             _orderRepository = orderRepository;
             _configuration = configuration;
+            _messageBus = messageBus;
 
             serviceBusConnectionString = _configuration.GetValue<string>("ServiceBusConnectionString");
             subcriptionCheckOut = _configuration.GetValue<string>("SubcriptionCheckOut");
             checkoutMessageTopic = _configuration.GetValue<string>("CheckoutMessageTopic");
+            orderPaymentMessageTopic = _configuration.GetValue<string>("OrderPaymentProcessTopic");
+            orderUpdatePaymentResultTopic = _configuration.GetValue<string>("OrderUpdatePaymentResultTopic");
 
             var client = new ServiceBusClient(serviceBusConnectionString);
-            checkOutProcessor = client.CreateProcessor(checkoutMessageTopic, subcriptionCheckOut);
+
+            checkOutProcessor = client.CreateProcessor(checkoutMessageTopic);
+            orderUpdatePaymentStatusProcessor = client.CreateProcessor(orderUpdatePaymentResultTopic, subcriptionCheckOut);
         }
 
         public async Task Start()
@@ -41,12 +51,21 @@ namespace Mango.Services.OrderAPI.Messaging
             checkOutProcessor.ProcessMessageAsync += OnCheckOutMessageReceived;
             checkOutProcessor.ProcessErrorAsync += ErrorHandler;
             await checkOutProcessor.StartProcessingAsync();
+
+            orderUpdatePaymentStatusProcessor.ProcessMessageAsync += OnOrderPaymentUpdateReceived;
+            orderUpdatePaymentStatusProcessor.ProcessErrorAsync += ErrorHandler;
+            await orderUpdatePaymentStatusProcessor.StartProcessingAsync();
         }
-        
+
+
+
         public async Task Stop()
         {
             await checkOutProcessor.StopProcessingAsync();
             await checkOutProcessor.DisposeAsync();
+
+            await orderUpdatePaymentStatusProcessor.StopProcessingAsync();
+            await orderUpdatePaymentStatusProcessor.DisposeAsync();
         }
 
         Task ErrorHandler(ProcessErrorEventArgs args)
@@ -64,23 +83,21 @@ namespace Mango.Services.OrderAPI.Messaging
 
             OrderHeader orderHeader = new()
             {
-                Id = checkoutHeaderDTO.Id,
-                CardNumber = checkoutHeaderDTO.CardNumber,
-                CartTotalItem = checkoutHeaderDTO.CartTotalItem,
-                DiscountTotal = checkoutHeaderDTO.DiscountTotal,
-                OrderDetails = new List<OrderDetails>(),
-                PickupDateTime = checkoutHeaderDTO.PickupDateTime,
-                CouponCode = checkoutHeaderDTO.CouponCode,
-                CVV = checkoutHeaderDTO.CVV,
-                Email = checkoutHeaderDTO.Email,
-                ExpiryMonthYear = checkoutHeaderDTO.ExpiryMonthYear,
+                UserId = checkoutHeaderDTO.UserId,
                 FirstName = checkoutHeaderDTO.FirstName,
                 LastName = checkoutHeaderDTO.LastName,
+                OrderDetails = new List<OrderDetails>(),
+                CardNumber = checkoutHeaderDTO.CardNumber,
+                CouponCode = checkoutHeaderDTO.CouponCode,
+                CVV = checkoutHeaderDTO.CVV,
+                DiscountTotal = checkoutHeaderDTO.DiscountTotal,
+                Email = checkoutHeaderDTO.Email,
+                ExpiryMonthYear = checkoutHeaderDTO.ExpiryMonthYear,
                 OrderTime = DateTime.Now,
                 OrderTotal = checkoutHeaderDTO.OrderTotal,
                 PaymentStatus = false,
                 Phone = checkoutHeaderDTO.Phone,
-                UserId = checkoutHeaderDTO.UserId
+                PickupDateTime = checkoutHeaderDTO.PickupDateTime
             };
 
             foreach(var detailList in checkoutHeaderDTO.CartDetails)
@@ -98,6 +115,37 @@ namespace Mango.Services.OrderAPI.Messaging
             }
 
             await _orderRepository.AddOrder(orderHeader);
+
+            PaymentRequestMessage paymentRequestMessage = new()
+            {
+                Name = orderHeader.FirstName + " " + orderHeader.LastName,
+                CardNumber = orderHeader.CardNumber,
+                CVV = orderHeader.CVV,
+                ExpiryMonthYear = orderHeader.ExpiryMonthYear,
+                OrderId = orderHeader.Id,
+                OrderTotal = orderHeader.OrderTotal
+            };
+
+            try
+            {
+                await _messageBus.PublicMessage(paymentRequestMessage, orderPaymentMessageTopic);
+                await args.CompleteMessageAsync(args.Message);
+            }
+            catch
+            {
+                throw;
+            }
+        }
+
+        private async Task OnOrderPaymentUpdateReceived(ProcessMessageEventArgs args)
+        {
+            var message = args.Message;
+            var body = Encoding.UTF8.GetString(message.Body);
+
+            UpdatePaymentResultMessage paymentResultMessage = JsonConvert.DeserializeObject<UpdatePaymentResultMessage>(body);
+
+            await _orderRepository.UpdateOrderPaymentStatus(paymentResultMessage.OrderId, paymentResultMessage.Status);
+            await args.CompleteMessageAsync(args.Message);
         }
     }
 }
