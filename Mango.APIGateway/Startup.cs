@@ -37,8 +37,8 @@ namespace Mango.APIGateway
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            await app.UseOcelot();
+            
+             await app.UseOcelot();
         }
     }
 }

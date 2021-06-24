@@ -23,7 +23,6 @@ namespace Mango.Services.ProductAPI.Controllers
             _response = new ResponseDTO();
         }
 
-        //[Authorize]
         [HttpGet]
         public async Task<object> Get()
         {
@@ -42,7 +41,6 @@ namespace Mango.Services.ProductAPI.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
         [Route("{id}")]
         public async Task<object> GetProductById(int id)
         {
@@ -61,7 +59,7 @@ namespace Mango.Services.ProductAPI.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin")]    
         public async Task<object> Post([FromBody] ProductDTO productDTO)
         {
             try

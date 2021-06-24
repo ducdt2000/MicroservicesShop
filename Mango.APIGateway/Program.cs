@@ -21,6 +21,10 @@ namespace Mango.APIGateway
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder.UseStartup<Startup>();
+                })
+                .ConfigureAppConfiguration((hostingContext, configure) =>
+                {
+                    configure.AddJsonFile("ocelot.json");
                 });
     }
 }
