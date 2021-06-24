@@ -14,5 +14,10 @@ namespace Mango.Services.Identity.DbContext
         {
 
         }
+
+        protected override void OnModelCreating(ModelBuilder builder)
+        {
+            base.OnModelCreating(builder);
+        }
     }
 }

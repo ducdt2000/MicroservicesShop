@@ -88,6 +88,20 @@ namespace Mango.Services.Identity
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
+
+
+            try
+            {
+
+                using (var services = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+                {
+                    using var context = services.ServiceProvider.GetService<AppDbContext>();
+                    context.Database.Migrate();
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }

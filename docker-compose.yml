@@ -1,0 +1,83 @@
+version: '3.4'
+
+services:
+  db:
+    image: "mcr.microsoft.com/mssql/server:2019-latest"
+    environment:
+      SA_PASSWORD: "@Alo123123"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "2000:80"
+      - "14330:1433"
+    mem_limit: "4GB"
+
+  mango.services.couponapi:
+    image: ${DOCKER_REGISTRY-}mangoservicescouponapi
+    build:
+      context: .
+      dockerfile: Mango.Services.CouponAPI/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=https://+:443;http://+:80
+      - ASPNETCORE_Kestrel__Certificates__Default__Password="@Alo123123"
+      - ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx
+    ports:
+      - "44372:80"
+    volumes:
+      - ./https/aspnetapp.pfx:/https/aspnetapp.pfx:ro
+    depends_on:
+      - db
+
+  mango.services.identity:
+    image: ${DOCKER_REGISTRY-}mangoservicesidentity
+    build:
+      context: .
+      dockerfile: Mango.Services.Identity/Dockerfile
+    ports:
+      - "44388:80"
+    depends_on:
+      - db
+
+  mango.services.productapi:
+    image: ${DOCKER_REGISTRY-}mangoservicesproductapi
+    build:
+      context: .
+      dockerfile: Mango.Services.ProductAPI/Dockerfile
+    ports:
+      - "44332:80"
+    depends_on:
+      - db
+
+  mango.services.shoppingcartapi:
+    image: ${DOCKER_REGISTRY-}mangoservicesshoppingcartapi
+    build:
+      context: .
+      dockerfile: Mango.Services.ShoppingCartAPI/Dockerfile
+    ports:
+      - "44381:80"
+    depends_on:
+      - db
+
+  mango.apigateway:
+    image: ${DOCKER_REGISTRY-}mangoapigateway
+    build:
+      context: .
+      dockerfile: Mango.APIGateway/Dockerfile
+    ports:
+      - "5050:80"
+
+    depends_on:
+      - mango.services.shoppingcartapi
+      - mango.services.productapi
+      - mango.services.couponapi
+
+  mango.web:
+    image: ${DOCKER_REGISTRY-}mangoweb
+    build:
+      context: .
+      dockerfile: Mango.Web/Dockerfile
+    ports:
+      - "1000:80"
+    depends_on:
+      - mango.apigateway
+
