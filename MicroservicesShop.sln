@@ -31,7 +31,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mango.ServicesPaymentAPI", 
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateway", "Gateway", "{E412D24F-CCD1-407C-858D-45C5395B3C2F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mango.APIGateway", "Mango.APIGateway\Mango.APIGateway.csproj", "{2DB5CB0A-FAC2-41CC-B32C-F5D37FE97899}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mango.APIGateway", "Mango.APIGateway\Mango.APIGateway.csproj", "{2DB5CB0A-FAC2-41CC-B32C-F5D37FE97899}"
+EndProject
+Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{934BDFCB-112A-4525-80F3-195455D0007A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -79,6 +81,10 @@ Global
 		{2DB5CB0A-FAC2-41CC-B32C-F5D37FE97899}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2DB5CB0A-FAC2-41CC-B32C-F5D37FE97899}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2DB5CB0A-FAC2-41CC-B32C-F5D37FE97899}.Release|Any CPU.Build.0 = Release|Any CPU
+		{934BDFCB-112A-4525-80F3-195455D0007A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{934BDFCB-112A-4525-80F3-195455D0007A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{934BDFCB-112A-4525-80F3-195455D0007A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{934BDFCB-112A-4525-80F3-195455D0007A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

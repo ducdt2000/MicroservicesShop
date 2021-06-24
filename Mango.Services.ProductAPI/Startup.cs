@@ -132,6 +132,20 @@ namespace Mango.Services.ProductAPI
             {
                 endpoints.MapControllers();
             });
+
+            //database auto update when project build
+            try
+            {
+
+                using (var services = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+                {
+                    using var context = services.ServiceProvider.GetService<ApplicationDbContext>();
+                    context.Database.Migrate();
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }

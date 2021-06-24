@@ -96,6 +96,8 @@
       }
     },
     //Coupon Service
+    //localhost:44372/api/cou...
+    //5050/coupon/{code}
     {
       "DownStreamPathTemplate": "/api/coupon/{code}",
       "DownStreamScheme": "https",

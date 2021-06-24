@@ -130,6 +130,19 @@ namespace Mango.Services.CouponAPI
             {
                 endpoints.MapControllers();
             });
+
+
+            try
+            {
+                using (var services = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+                {
+                    using var context = services.ServiceProvider.GetService<AppDbContext>();
+                    context.Database.Migrate();
+                }
+            }
+            catch (Exception ex)
+            {
+            }
         }
     }
 }
