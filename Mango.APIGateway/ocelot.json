@@ -1,0 +1,115 @@
+{
+
+  //"ProductService": "https://localhost:44332",
+  //"ShoppingCartService": "https://localhost:44381",
+  //"CouponService": "https://localhost:44372"
+  "Routes": [
+    // Product
+    {
+      "DownStreamPathTemplate": "/api/Product",
+      "DownStreamScheme": "https",
+      "DownStreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44332
+        }
+      ],
+      "UpStreamPathTemplate": "/product",
+      "UpStreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownStreamPathTemplate": "/api/Product/{id}",
+      "DownStreamScheme": "https",
+      "DownStreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44332
+        }
+      ],
+      "UpStreamPathTemplate": "/product/{id}",
+      "UpStreamHttpMethod": [ "GET" ]
+    },
+    {
+      "DownStreamPathTemplate": "/api/Product",
+      "DownStreamScheme": "https",
+      "DownStreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44332
+        }
+      ],
+      "UpStreamPathTemplate": "/product",
+      "UpStreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": [ "mango" ]
+      }
+    },
+    {
+      "DownStreamPathTemplate": "/api/Product/{id}",
+      "DownStreamScheme": "https",
+      "DownStreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44332
+        }
+      ],
+      "UpStreamPathTemplate": "/product/{id}",
+      "UpStreamHttpMethod": [ "DELETE" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": [ "mango" ]
+      }
+    },
+
+    //Cart
+    {
+      "DownStreamPathTemplate": "/api/cart/GetCart/{id}",
+      "DownStreamScheme": "https",
+      "DownStreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44381
+        }
+      ],
+      "UpStreamPathTemplate": "/cart/getcart/{id}",
+      "UpStreamHttpMethod": [ "GET" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": [ "mango" ]
+      }
+    },
+    {
+      "DownStreamPathTemplate": "/api/cart/{everything}",
+      "DownStreamScheme": "https",
+      "DownStreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44381
+        }
+      ],
+      "UpStreamPathTemplate": "/cart/{everything}",
+      "UpStreamHttpMethod": [ "POST" ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": [ "mango" ]
+      }
+    },
+    //Coupon Service
+    {
+      "DownStreamPathTemplate": "/api/coupon/{code}",
+      "DownStreamScheme": "https",
+      "DownStreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 44372
+        }
+      ],
+      "UpStreamPathTemplate": "/coupon/{code}",
+      "UpStreamHttpMethod": [ "GET" ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:5050"
+  }
+}
